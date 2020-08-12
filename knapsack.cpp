@@ -2,7 +2,7 @@
 using namespace std;
 
 int main(){
-    int n = 10; //cantidad de objetos
+    int n = 15; //cantidad de objetos
     int W; //capacidad de mochila
 
     //vector<int> objetos(n);   //vector de objetos a añadir
