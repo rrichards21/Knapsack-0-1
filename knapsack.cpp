@@ -43,10 +43,5 @@ int main(){
         int n = in[0];
         int W = in[1];
     }
-    int n; //cantidad de objetos
-    int W; //capacidad de mochila
-    //vector<int> objetos(n);   //vector de objetos a añadir
-    //vector<int> B(n); //vector binario (0 no está en mochila, 1 está en mochila)
-    
     return 0;
 }
