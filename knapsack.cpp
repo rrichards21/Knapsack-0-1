@@ -5,9 +5,14 @@ using namespace std;
 Se tiene una mochila con capacidad W
 Se tienen n objetos que se pueden agregar a la mochila
 Cada objeto tiene un peso p[i] y un valor v[i]
+<<<<<<< HEAD
 Se desea encontrar el subconjunto de n objetos que se pueden agregar a la mochila dada su capacidad,
 tal que ese subconjuno sea el de mayor valor, es decir que maximizan el valor total de los objetos
 dada la capacidad de la mochila.
+=======
+Se desea encontrar el subconjunto de n objetos que se pueden agregar a la mochila,
+que maximicen la capacidad que esta posee.
+>>>>>>> 6d4451c925c6fc1324fcaccbdffc195352427f46
 
     
     a) Describa y proporcione una solución usando programación dinámica y establezca su
@@ -31,6 +36,7 @@ void parse(const string& str, const string& delimiters,vector<int>& p){
     }
 }
 
+<<<<<<< HEAD
 int knapsack(vector<int> &values, vector<int> &weights, int C, vector<int> &x){
     vector<int> aux(C+1);
     vector<vector<int> > cache(values.size()+1,aux);
@@ -57,10 +63,16 @@ int knapsack(vector<int> &values, vector<int> &weights, int C, vector<int> &x){
 int main(){
     ifstream input;
     input.open("test.txt", ios_base::app);
+=======
+int main(){
+    ifstream input;
+    input.open("entradas.txt", ios_base::app);
+>>>>>>> 6d4451c925c6fc1324fcaccbdffc195352427f46
     string linea;
     while(getline(input, linea)){
         vector<int> in;
         parse(linea," ",in);
+<<<<<<< HEAD
         int n = in[0];
         int C = in[1];
         int j = 0, k = 0;
@@ -85,5 +97,13 @@ int main(){
         cout<<endl;
     }
     
+=======
+        for(int i = 0; i < in.size(); i++){
+            cout<<in[i]<<" ";
+        }
+        int n = in[0];
+        int W = in[1];
+    }
+>>>>>>> 6d4451c925c6fc1324fcaccbdffc195352427f46
     return 0;
 }
