@@ -6,7 +6,7 @@ Se tiene una mochila con capacidad W
 Se tienen n objetos que se pueden agregar a la mochila
 Cada objeto tiene un peso p[i] y un valor v[i]
 Se desea encontrar el subconjunto de n objetos que se pueden agregar a la mochila,
-que maximicen la capacidad que esta posee.
+tal que maximicen la capacidad que esta posee.
 
     
     a) Describa y proporcione una solución usando programación dinámica y establezca su
@@ -37,16 +37,10 @@ int main(){
     while(getline(input, linea)){
         vector<int> in;
         parse(linea," ",in);
-        for(int i = 0; i < in.size(); i++){
-            cout<<in[i]<<" ";
-        }
         int n = in[0];
         int W = in[1];
+        vector<int> x(in.size()/2 - 1);
+        //leer 
     }
-    int n; //cantidad de objetos
-    int W; //capacidad de mochila
-    //vector<int> objetos(n);   //vector de objetos a añadir
-    //vector<int> B(n); //vector binario (0 no está en mochila, 1 está en mochila)
-    
     return 0;
 }
