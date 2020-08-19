@@ -5,8 +5,9 @@ using namespace std;
 Se tiene una mochila con capacidad W
 Se tienen n objetos que se pueden agregar a la mochila
 Cada objeto tiene un peso p[i] y un valor v[i]
-Se desea encontrar el subconjunto de n objetos que se pueden agregar a la mochila,
-tal que maximicen la capacidad que esta posee.
+Se desea encontrar el subconjunto de n objetos que se pueden agregar a la mochila dada su capacidad,
+tal que ese subconjuno sea el de mayor valor, es decir que maximizan el valor total de los objetos
+dada la capacidad de la mochila.
 
     
     a) Describa y proporcione una solución usando programación dinámica y establezca su
@@ -30,17 +31,59 @@ void parse(const string& str, const string& delimiters,vector<int>& p){
     }
 }
 
+int knapsack(vector<int> &values, vector<int> &weights, int C, vector<int> &x){
+    vector<int> aux(C+1);
+    vector<vector<int> > memo(values.size()+1,aux);
+    for(int elementosTotales = 0; elementosTotales <= values.size(); elementosTotales++){
+        for(int capacidad = 0; capacidad <= C; capacidad++){
+            int elementoAct = elementosTotales - 1;     //Elemento actual
+            if (elementosTotales == 0 || capacidad == 0) {
+            memo[elementosTotales][capacidad] = 0;
+            } 
+            else if (weights[elementoAct] > capacidad) {
+                memo[elementosTotales][capacidad] = memo[elementosTotales - 1][capacidad];
+            } 
+            else {
+                int seleccionar = values[elementoAct] + memo[elementosTotales - 1][capacidad - weights[elementoAct]];
+                int noSeleccionar = memo[elementosTotales - 1][capacidad];
+                if(seleccionar > noSeleccionar) x[elementoAct] = 1;
+                memo[elementosTotales][capacidad] = max(seleccionar, noSeleccionar);
+            }
+        }
+    }
+    return memo[values.size()][C];
+}
+
 int main(){
     ifstream input;
-    input.open("entradas.txt", ios_base::app);
+    input.open("test.txt", ios_base::app);
     string linea;
     while(getline(input, linea)){
         vector<int> in;
         parse(linea," ",in);
         int n = in[0];
-        int W = in[1];
-        vector<int> x(in.size()/2 - 1);
-        //leer 
+        int C = in[1];
+        int j = 0, k = 0;
+        vector<int> w(n),v(n),x(n,0);
+        for(int i = 2; i < in.size(); i++){
+            if(i%2 == 0){ 
+                w[j] = in[i];
+                j++;
+            }
+            else{
+                v[k] = in[i];
+                k++;
+            }
+        }
+        vector<int> aux(C,-1);
+        vector<vector<int> > tabla(C,aux);
+        cout<<n<<" ";
+        cout<<knapsack(v,w,C,x)<<" "; //Working
+        for(int i = 0; i < x.size(); i++){
+            cout<<x[i]<<" ";
+        }
+        cout<<endl;
     }
+    
     return 0;
 }
