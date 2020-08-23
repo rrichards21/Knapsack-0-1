@@ -1,6 +1,7 @@
 #include <bits/stdc++.h>
 using namespace std;
 
+
 /* Definición algoritmo
 Se tiene una mochila con capacidad W
 Se tienen n objetos que se pueden agregar a la mochila
@@ -54,6 +55,23 @@ int knapsack(vector<int> &values, vector<int> &weights, int C, vector<int> &x){
     return memo[values.size()][C];
 }
 
+/*
+    float e: margen de error
+*/
+int knapsack_approx(float e, vector<int> &values, vector<int> &weights, int C, vector<int> &x){
+    
+    int V = 0;
+    int n = values.size();
+    for (int i = 0; i < n; i++)
+        V += values.at(i);
+    int X = (1-e)*V/n;
+
+    for (int i = 0; i < n; i++) 
+        values[i] = values[i] / X;
+
+    return knapsackV();
+}
+
 int main(){
     ifstream input;
     input.open("test.txt", ios_base::app);
@@ -83,7 +101,6 @@ int main(){
             cout<<x[i]<<" ";
         }
         cout<<endl;
-    }
-    
+    }    
     return 0;
 }
