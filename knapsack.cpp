@@ -86,66 +86,95 @@ int knapsack_approx(float e, vector<int> &values, vector<int> &weights, int C, v
     return 1;
 }
 
-int knapsackV(vector<int> &values, vector<int> &weights, int C, vector<int> &x) {
+int knapsackV1(vector<int> &values, vector<int> &weights, int C, vector<int> &x) {
     int V = 0;
     int n = values.size();
     for (int i = 0; i < n; i++)
         V += values[i];
-    vector<int> aux(V+1,MAX);
-    vector<vector<int> > memo(values.size()+1, aux);
-    /*for(int i = 0; i < n + 1; i++){
-        for(int j = 0; j < V + 1; j++){
-            if (i == 0 || j == 0) {
-                memo[i][j] = MAX;
-            } 
-        }
-    }*/
-    stack<int> prevRow;
-    for (int e = 1; e < n + 1; e++){
+    vector<int> aux(V+1, 0);
+    vector<vector<int> > memo(values.size() + 1, aux);        
+    for (int e = 1; e < n + 1; e++){        
         for (int v = 1; v < V + 1; v++) {
-            if (values[e-1] >= v) {
-
-                //Ver valor de celda de arriba
-                if(memo[e-1][v] > weights[e-1] && memo[e-1][v] != MAX){
-                    memo[e][v] = memo[e-1][v];
-                    prevRow.push(memo[e][v]);
-                }
-                //Insertar peso de elemento actual si casilla de arriba es menor
-                else if(weights[e-1] > memo[e-1][v]){
-                    memo[e][v] = weights[e-1];
-                    prevRow.push(memo[e][v]);
-                }
-                //Agregar elemento actual a los elementos que permiten generar la capacidad
-                //de la mochila
-                else{
-                    int sum = weights[e-1];
-                    while(!prevRow.empty()){
-                        act = prevRow.top();
-                        //aqui se está haciendo una suma con los pesos, se debe ver
-                        //que el valor del elemento actual sumado a algun/os elemento/os de la
-                        //fila anterior generen el valor actual (v)
-                        if(sum + act <= v){
-                            sum += act;
-                        }
-                        act.pop();
-                    }
-                    /*for(int i = v; i > 0; i--){
-                        if(sum+memo[e-1][i] <= v && memo[e-1][i] != MAX){
-                            sum += memo[e-1][i];
-                        }
-                    }*/
-                    if(v >= values[e-1]){ memo[e][v] = sum;cout<<"soy mayor\n";}
-                    else{cout<<"soy menor"<<endl;}
-                }
+            int opcion1 = MAX;
+            int opcion2 = MAX;
+            int valorRestante = v - values[e - 1]; //1
+            if (memo[e - 1][v] > 0)
+                opcion1 = memo[e - 1][v];
+            if (valorRestante >= 0) {
+                if (valorRestante == 0) 
+                    opcion2 = weights[e - 1];
+                else if (memo[e - 1][valorRestante] != 0)
+                    opcion2 = weights[e - 1] + memo[e - 1][valorRestante];
             }
-            else {
-                memo[e][v] = memo[e-1][v];
-            }
-        }        
+            int seleccionado = min(opcion1, opcion2);
+            if (seleccionado != MAX)
+                memo[e][v] = seleccionado;
+        }
     }
-
     return memo[values.size()][V];
 }
+
+
+// int knapsackV(vector<int> &values, vector<int> &weights, int C, vector<int> &x) {
+//     int V = 0;
+//     int n = values.size();
+//     for (int i = 0; i < n; i++)
+//         V += values[i];
+//     vector<int> aux(V+1,MAX);
+//     vector<vector<int> > memo(values.size()+1, aux);
+//     /*for(int i = 0; i < n + 1; i++){
+//         for(int j = 0; j < V + 1; j++){
+//             if (i == 0 || j == 0) {
+//                 memo[i][j] = MAX;
+//             } 
+//         }
+//     }*/
+//     stack<int> prevRow;
+//     for (int e = 1; e < n + 1; e++){
+//         for (int v = 1; v < V + 1; v++) {
+//             if (values[e-1] >= v) {
+
+//                 //Ver valor de celda de arriba
+//                 if(memo[e-1][v] > weights[e-1] && memo[e-1][v] != MAX){
+//                     memo[e][v] = memo[e-1][v];
+//                     prevRow.push(memo[e][v]);
+//                 }
+//                 //Insertar peso de elemento actual si casilla de arriba es menor
+//                 else if(weights[e-1] > memo[e-1][v]){
+//                     memo[e][v] = weights[e-1];
+//                     prevRow.push(memo[e][v]);
+//                 }
+//                 //Agregar elemento actual a los elementos que permiten generar la capacidad
+//                 //de la mochila
+//                 else{
+//                     int sum = weights[e-1];
+//                     while(!prevRow.empty()){
+//                         act = prevRow.top();
+//                         //aqui se está haciendo una suma con los pesos, se debe ver
+//                         //que el valor del elemento actual sumado a algun/os elemento/os de la
+//                         //fila anterior generen el valor actual (v)
+//                         if(sum + act <= v){
+//                             sum += act;
+//                         }
+//                         act.pop();
+//                     }
+//                     /*for(int i = v; i > 0; i--){
+//                         if(sum+memo[e-1][i] <= v && memo[e-1][i] != MAX){
+//                             sum += memo[e-1][i];
+//                         }
+//                     }*/
+//                     if(v >= values[e-1]){ memo[e][v] = sum;cout<<"soy mayor\n";}
+//                     else{cout<<"soy menor"<<endl;}
+//                 }
+//             }
+//             else {
+//                 memo[e][v] = memo[e-1][v];
+//             }
+//         }        
+//     }
+
+//     return memo[values.size()][V];
+// }
 
 int main(){
     ifstream input;
@@ -171,7 +200,7 @@ int main(){
         vector<int> aux(C,-1);
         vector<vector<int> > tabla(C,aux);
         cout<<n<<" ";
-        knapsackV(v,w,C,x); //Working
+        knapsackV1(v,w,C,x); //Working
         for(int i = 0; i < x.size(); i++){
             cout<<x[i]<<" ";
         }
