@@ -72,6 +72,28 @@ int knapsack_approx(float e, vector<int> &values, vector<int> &weights, int C, v
     return knapsackV();
 }
 
+int knapsackV(vector<int> &values, vector<int> &weights, int C, vector<int> &x) {
+    int V = 0;
+    vector<int> aux(V+1);
+    int n = values.size();
+    for (int i = 0; i < n; i++)
+        V += values[i];
+    vector<vector<int> > memo(values.size()+1, aux);
+    for (int e = 1; e < n + 1; e++) {
+        for (int v = 1; v < V + 1; v++) {
+            if (values[e]<= v) {
+                int seleccionar = weights[e - 1] + memo[e - 1][v - values[e - 1]];
+                int noSeleccionar = memo[e - 1][v];
+                if(seleccionar < noSeleccionar) x[e - 1] = 1;
+                memo[e][v] = min(seleccionar, noSeleccionar);
+            } else {
+                memo[e][v] = memo[e-1][v];
+            }
+        }        
+    }
+    memo[values.size()][C];
+}
+
 int main(){
     ifstream input;
     input.open("test.txt", ios_base::app);
