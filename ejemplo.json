@@ -1,0 +1,14 @@
+{
+    "Lota": {
+        "Supermercados": [
+            Supermecado1,
+            Supermecado2,
+            Supermecado3
+        ],
+        "Farmacias": [
+            Farmacia1,
+            Farmacia2,
+            Farmacia3
+        ]
+    }
+}
