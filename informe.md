@@ -156,31 +156,32 @@ Consideremos una mochila de capacidad $C$ y los siguiente items:
 | Valor | 2 | 3 | 5 | 4 | 3 | 5 | 2 |
 
 Para entender el algoritmo debemos precisar cuál es el problema que en realidad resolvemos utilizando la siguiente tabla.
+
+|   |     | V | A | L | O | R | E | S |     |    |
+|---|-----|---|---|---|---|---|---|---|-----|----|
+|   |     | **1** | **2** | **3** | **4** | **5** | **6** | **7** | **...** | **24** |
+| **I** | **1**   | - | 3 | - | - | - | - | - | ... | ... |
+| **T** | **2**   | - | 3 | 2 | - | 5 | - |   | ... | ... |
+| **E** | **3**   | - | 3 | 2 | - | 4 | - | 7 | ... | ... |
+| **M** | **4**   | - | 3 | 2 | 5 | 4 | 8 | 7 | ... | ... |
+| **S** | **...**  | ... | ... | ... | ... | ... | ... | ... | ... | ... |
+
 Las columnas representan valores en el intervalo $[1, V]$ con $V = \sum_{i=1}^{7} v_i$, por su parte, las filas representan a los items.
 Cada columna servirá de valor objetivo de manera que en cada celda almacenamos un peso si y solo si alcanzamos dicho valor, ya sea insertando sólo ítem actual o una selección de items, privilegiando aquella alternativa de menor peso. 
 
-Si miramos la celda $(f, c) = (1,2)$ veremos el número **3** que es el **peso del item 1**. Notemos que para su fila ninguna otra celda está llena. Esto es evidente, pues estamos considerando un único elemento.
+Si miramos la celda $(f, c) = (1,2)$ veremos el número **3** que corresponde al **peso del item 1**. Notemos que para su fila ninguna otra celda está llena. Esto es evidente, pues estamos considerando un único elemento.
 
-Considerando la fila la celda $(f, c) = (2,2)$ nos enfrentamos al problema de buscar una combinación de ítems óptima de valor 2 por segunda vez. Al contrario que la primera vez, lo único que debemos hacer es rescatar el valor de la fila anterior. Nos hemos encontrado con un **problema superpuesto y hemos almacenado su valor para reducir la complejidad del problema**.
+Considerando la celda $(f, c) = (2,2)$ nos enfrentamos al problema de buscar una combinación de ítems óptima de valor 2 por segunda vez. Al contrario que la primera vez, lo único que debemos hacer es rescatar el valor de la fila anterior. Nos hemos encontrado con un **problema superpuesto y hemos almacenado su valor para reducir la complejidad del problema**.
 
 Siguiendo la misma lógica pongamos atención a la celda $(f, c) = (4,6)$. Si insertamos el **ítem 4** nos harán falta **2 unidades de valor** **¿Cuál es la combinación de objetos óptima para el valor 2?**. No será necesario recomputar la solución: esta siempre estará almacenada en la fila inmediatamente anterior (en caso de que exista).
 
 Una vez que hemos completado la tabla, podemos buscar la solución óptima para la mochila. Para esto, vamos a la última columna, la de mayor valor, y buscamos un peso $w$ tal que $w <= C$. Si no lo hayamos, retrocedemos una columna y buscamos de nuevo. Repetimos cuantas veces sea necesario. Para conseguir la lista de ítems, iteramos sobre las filas de la tabla. Para ver cuales pertenecen al conjunto solución, miramos la celda actual y la que está inmediatamente arriba, si tienen el mismo valor, el objeto actual no pertenece y debemos repetir el proceso hasta que hayamos alcanzado el valor objetivo. Podemos explicar intuitivamente esto: si una celda tiene el mismo valor que la de arriba quiere decir que es producto de una optimización previa. 
 
-Es necesario notar que este algoritmo realmente minimiza el peso de los objetos tomando como restricción un cierto valor $v$ y una combinación de items. A diferencia del caso anterior, la capacidad de la mochila no es relevante. En este ejemplo nunca hemos proporcionado un valor para $C% y las conclusiones siguen teniendo validez.
+Es necesario notar que este algoritmo realmente minimiza el peso de los objetos tomando como restricción un cierto valor $v$ y una combinación de items. A diferencia del caso anterior, la capacidad de la mochila no es relevante. En este ejemplo nunca hemos proporcionado un valor para $C$ y las conclusiones siguen teniendo validez.
 
 Supongamos que por motivos que escapan a nuestro poder el algoritmo se detiene en el **ítem 4**. Los resultados seguirán siendo válidos para esos cuatro objetos, o en otras palabras, nos encontramos frente una **subestructura óptima**.
 
-|   |     | V | A | L | O | R | E | S |     |    |
-|---|-----|---|---|---|---|---|---|---|-----|----|
-|   |     | **1** | **2** | **3** | **4** | **5** | **6** | **7** | **...** | **24** |
-| **I** | **1**   | - | 3 | - | - | - | - | - | ... | -  |
-| **T** | **2**   | - | 3 | 2 | - | 5 | - |   | ... |    |
-| **E** | **3**   | - | 3 | 2 | - | 4 | - | 7 | ... |    |
-| **M** | **4**   | - | 3 | 2 | 5 | 4 | 8 | 7 | ... |    |
-| **S** | **...**  |   |   |   |   |   |   |   | ... |    |
-
-
+**Implementación de la solución**
 ```cpp
 /*
     Input    
