@@ -19,7 +19,6 @@ $x_{i} \in {0, 1} \forall i \in N$
 
 Asuma que $v_{i} \in N$ y $p_{i} \in N$
 
-
 **a) Describa y proporcione una solución usando programación dinámica y establezca su complejidad asintótica del tiempo de ejecución.**
 
 Resolveremos el problema siguiendo esta estrategia
@@ -90,11 +89,13 @@ fun KS(n, C)
     mem[n][C] = result // El máximo número de veces que tenemos que hacer esta operación es (n*C)
     return result
 ```
-Ahora calcularemos el valor de cada uno una sola vez y las siguientes veces obtendremos su valor desde la memoria. Con esto logramos que el algoritmo se ejecute en $O(n*C)$. Esto es mucho mejor que el resultado anterior.
+En este caso calcularemos el valor de cada rama una sola vez y  en caso de requerir alguno de esos valores de nuevo, obtendremos su valor desde memoria. Con esto logramos que el algoritmo se ejecute en $O(n*C)$. Esto es mucho mejor que el resultado anterior.
 
 **b) ¿Qué puede decir respecto al tiempo de ejecución? Observa alguna diferencia a la forma en la cual hemos analizado el tiempo de ejecución en unidades anteriores? Establezca de que manera la complejidad obtenida para el problema puede incidir en la complejidad en términos de tiempo de ejecución. La complejidad asociada a la solución obtenida normalmente se conoce como pseudo polinomial. Investigue y comente por qué la solución para la mochila 0-1 se dice que es pseudo polinomial.** 
 
-En el ejemplo anterior utilizamos un arreglo para guardar resultados intermedios y luego concluimos que el tiempo de ejecución es $O(n*C)$. Esto parece ser linear, sin embargo podemos encontrar casos en que esto no se cumple. Supongamos que $C = n!$, en este caso la complejidad de nuestro algoritmo es pero que cuando lo hicimos por fuerza bruta. De esta forma la complejidad del problema puede afectar la complejidad en términos de tiempo de ejecución, convirtiendo en una peor una solución teóricamente mejor.
+En el ejemplo anterior utilizamos un arreglo para guardar resultados intermedios y luego concluimos que el tiempo de ejecución es $O(n*C)$. Esto parece ser linear, sin embargo podemos encontrar casos en que esto no se cumple. Supongamos que $C = n!$, en este caso la complejidad de nuestro algoritmo es peor que cuando lo hicimos por fuerza bruta. De esta forma la complejidad del problema puede afectar la complejidad en términos de tiempo de ejecución, haciendo peor una solución que era teóricamente mejor. 
+
+Un algoritmo cuya complejidad temporal de peor caso depende del valor numérico de la entrada (¡no el numero de elementos de la entrada!) es llamado pseudopolinomial. Claramente este es el caso de la mochila 0-1. Supongamos que la capacidad de la mochila es $C = 2^n$, esto es peor que la primera solución.
 
 **c) Implemente el algoritmo usando el enfoque bottom-up mediante tabulación.**
 
@@ -260,10 +261,10 @@ int knapsack_approx(float e, vector<int> &values, vector<int> &weights, int C, v
     int n = values.size();
     for (int i = 0; i < n; i++)
         V += values.at(i);
-    int X = (1-e)*V/n;
+    float X = (1-e)*V/n;
 
     for (int i = 0; i < n; i++) 
-        values[i] = values[i] / X;
+        values[i] = floor(values[i] / X);
 
     return knapsackV(values, weights, C, x);
 }
@@ -273,19 +274,17 @@ El tiempo de ejecución del algoritmo original es $O(n*V)$, donde $V = \Sigma_{i
 
 $O(n*\frac{V}{(1-\beta)\frac{V}{n}}) \iff O(\frac{n^2}{(1-\beta)})$
 
-De esta forma, se obtiene que el tiempo de ejecución para el algoritmo aproximado es de $O(\frac{n^2}{(1-\beta)})$. De esta forma se elimina el factor $V$, lo que lleva a que el algoritmo quede en tiempo de ejecución de peor caso en exponencial, dependiendo de si el valor $\beta$ es cercano a 1.
+De esta forma, se obtiene que el tiempo de ejecución para el algoritmo aproximado es de $O(\frac{n^2}{(1-\beta)})$. De esta forma se elimina el factor $V$, lo que lleva a que el algoritmo quede en tiempo de ejecución de peor caso en exponencial, dependiendo de si el valor $\beta$ es cercano a 0.
 
 Si analizamos el caso en que se tienen dos objetos $v_a$ y $v_b$ y $v_a < v_b$, ocurrirá un error si es que $\lfloor \frac{v_{a}}{x} \rfloor = \lfloor \frac{v_{b}}{x} \rfloor$, ya que el algoritmo puede decidir tomar $v_a$ pero en realidad la mejor decisión es tomar $v_b$, de esta forma el valor perdido al realizar la aproximación es de $v_b - v_a < x$, es decir, cada error será menor a $x$.
 
 Si existen a lo más $n$ objetos seleccionados en una solución óptima, se tiene que a lo más se pueden generar $n$ errores, donde cada uno de esos errores cuesta menos que $x$, de esta forma el error absoluto máximo del algoritmo será menor a $n*x$.
 
-Sea $V$ la solución óptima del problema y $V-nx$ la solución aproximada, se tiene que el factor de aproximación $\rho (n) = \frac{V}{V-nx}$, donde $x = \frac{V}{n}(1-\beta)$, de esta manera se obtiene lo siguiente:
+Sea $V$ la solución óptima del problema, y $V-nx$ su solución aproximada, se tiene el factor de aproximación $\rho (n) = \frac{V}{V-nx}$, donde $x = \frac{V}{n}(1-\beta)$,  reemplazando $x$ se obtiene lo siguiente:
 
  $\rho (n) = \frac{V}{V-n\frac{V}{n}(1-\beta)} = \frac{V}{V-V(1-\beta)} = \frac{V}{V-V +V\beta)} = \frac{V}{V\beta} = \frac{1}{\beta}$
 
 Así, $ \rho (n) = \frac{1}{\beta}$, por lo que para tener una aproximación a la solución óptima que evite errores, se deben tener valores de $\beta$ que sean cercanos a 1, en consecuencia de tener un tiempo de ejecución más alto, en el caso de si se escogen valores de $\beta$ más alejados a 1, se tiene como consecuencia un tiempo de ejecución más rápido, pero a cambio se tendrán más errores.
-
-
 
 **f) Considere que la entrada se proporciona en un archivo de entrada donde cada linea contiene el siguiente formato:**
 **$<n> <C> <lista$  $p_i$  $v_i>$**
