@@ -2,22 +2,6 @@
 using namespace std;
 #define MAX 99999
 
-/* Definición algoritmo
-Se tiene una mochila con capacidad W
-Se tienen n objetos que se pueden agregar a la mochila
-Cada objeto tiene un peso p[i] y un valor v[i]
-Se desea encontrar el subconjunto de n objetos que se pueden agregar a la mochila dada su capacidad,
-tal que ese subconjuno sea el de mayor valor, es decir que maximizan el valor total de los objetos
-dada la capacidad de la mochila.
-
-    
-    a) Describa y proporcione una solución usando programación dinámica y establezca su
-    complejidad asintótica del tiempo de ejecución.
-*/
-typedef struct nodo{
-    int valor;
-    nodo *cosa;
-}nodo;
 void parse(const string& str, const string& delimiters,vector<int>& p){
 	vector<string> tokens;
 	string::size_type lastPos = str.find_first_not_of(delimiters, 0);
@@ -35,6 +19,16 @@ void parse(const string& str, const string& delimiters,vector<int>& p){
     }
 }
 
+/*
+    Input    
+    values: valores de los objetos
+    weights: peso de los objetos
+    C: capacidad en peso de la mochila
+    x: arreglo binario vacío que representa los objetos dentro de la mochila
+    Output: 
+    valor total de los objetos dentro de la mochila
+    x: arreglo binario con los objetos dentro de la mochila al finalizar el algortimo
+*/
 void knapsack(vector<int> &values, vector<int> &weights, int C, vector<int> &x){
     vector<int> aux(C+1);
     vector<vector<int> > memo(values.size()+1,aux);
@@ -70,50 +64,15 @@ void knapsack(vector<int> &values, vector<int> &weights, int C, vector<int> &x){
 }
 
 /*
-    float e: margen de error
+    Input    
+    values: valores de los objetos
+    weights: peso de los objetos
+    C: capacidad en peso de la mochila
+    x: arreglo binario vacío que representa los objetos dentro de la mochila
+    Output: 
+    valor total de los objetos dentro de la mochila
+    x: arreglo binario con los objetos dentro de la mochila al finalizar el algortimo
 */
-int knapsack_approx(float e, vector<int> &values, vector<int> &weights, int C, vector<int> &x){
-    
-    int V = 0;
-    int n = values.size();
-    for (int i = 0; i < n; i++)
-        V += values.at(i);
-    int X = (1-e)*V/n;
-
-    for (int i = 0; i < n; i++) 
-        values[i] = values[i] / X;
-
-    return 1;
-}
-
-int knapsackV1(vector<int> &values, vector<int> &weights, int C, vector<int> &x) {
-    int V = 0;
-    int n = values.size();
-    for (int i = 0; i < n; i++)
-        V += values[i];
-    vector<int> aux(V+1, 0);
-    vector<vector<int> > memo(values.size() + 1, aux);
-    for (int e = 1; e < n + 1; e++){        
-        for (int v = 1; v < V + 1; v++) {
-            int opcion1 = MAX;
-            int opcion2 = MAX;
-            int valorRestante = v - values[e - 1]; //1
-            if (memo[e - 1][v] > 0)
-                opcion1 = memo[e - 1][v];
-            if (valorRestante >= 0) {
-                if (valorRestante == 0) 
-                    opcion2 = weights[e - 1];
-                else if (memo[e - 1][valorRestante] != 0)
-                    opcion2 = weights[e - 1] + memo[e - 1][valorRestante];
-            }
-            int seleccionado = min(opcion1, opcion2);
-            if (seleccionado != MAX) 
-                memo[e][v] = seleccionado;                                        
-        }
-    }
-    return memo[values.size()][V];
-}
-
 int knapsackV(vector<int> &values, vector<int> &weights, int C, vector<int> &x) {
     int V = 0;
     int n = values.size();
@@ -158,13 +117,36 @@ int knapsackV(vector<int> &values, vector<int> &weights, int C, vector<int> &x) 
             v = v - values[e - 1];            
         }
     }
-    return memo[values.size()][V];
+    return max_weight.second;
 }
 
+/*
+    Input
+    float e: margen de error
+    values: valores de los objetos
+    weights: peso de los objetos
+    C: capacidad en peso de la mochila
+    x: arreglo binario vacío que representa los objetos dentro de la mochila
+    Output: 
+    valor total de los objetos dentro de la mochila
+    x: arreglo binario con los objetos dentro de la mochila al finalizar el algortimo
+*/
+int knapsack_approx(float e, vector<int> &values, vector<int> &weights, int C, vector<int> &x){    
+    int V = 0;
+    int n = values.size();
+    for (int i = 0; i < n; i++)
+        V += values.at(i);
+    int X = (1-e)*V/n;
+
+    for (int i = 0; i < n; i++) 
+        values[i] = values[i] / X;
+
+    return knapsackV(values, weights, C, x);
+}
 
 int main(){
     ifstream input;
-    input.open("test3.txt", ios_base::app);
+    input.open("test2.txt", ios_base::app);
     string linea;
     while(getline(input, linea)){
         vector<int> in;
