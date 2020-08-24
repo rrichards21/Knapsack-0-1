@@ -1,2 +1,3 @@
-# Knapsack-0-1
-Knapsack problem resolution with dynamic programming (bottom-up)
+Para compilar, escribir en la terminal:
+
+g++ -g knapsack.cpp -o knapsack
