@@ -98,9 +98,175 @@ En el ejemplo anterior utilizamos un arreglo para guardar resultados intermedios
 
 **c) Implemente el algoritmo usando el enfoque bottom-up mediante tabulación.**
 
+```cpp
+/*
+    Input    
+    values: valores de los objetos
+    weights: peso de los objetos
+    C: capacidad en peso de la mochila
+    x: arreglo binario vacío que representa los objetos dentro de la mochila
+    Output: 
+    valor total de los objetos dentro de la mochila
+    x: arreglo binario con los objetos dentro de la mochila al finalizar el algortimo
+*/
+void knapsack(vector<int> &values, vector<int> &weights, int C, vector<int> &x){
+    vector<int> aux(C+1);
+    vector<vector<int> > memo(values.size()+1,aux);
+    for(int elementosTotales = 0; elementosTotales <= values.size(); elementosTotales++){
+        for(int capacidad = 0; capacidad <= C; capacidad++){
+            int elementoAct = elementosTotales - 1;     //Elemento actual
+            if (elementosTotales == 0 || capacidad == 0) {
+            memo[elementosTotales][capacidad] = 0;
+            } 
+            else if (weights[elementoAct] > capacidad) {
+                memo[elementosTotales][capacidad] = memo[elementosTotales - 1][capacidad];
+            } 
+            else {
+                int seleccionar = values[elementoAct] + memo[elementosTotales - 1][capacidad - weights[elementoAct]];
+                int noSeleccionar = memo[elementosTotales - 1][capacidad];
+                memo[elementosTotales][capacidad] = max(seleccionar, noSeleccionar);
+            }
+        }
+    }
+    int res = memo[values.size()][C];     
+    printf("%d ", res); 
+      
+    int c = C; 
+    for(int i = values.size(); i > 0 && res > 0; i--) {
+        if (res == memo[i - 1][c])  
+            continue;         
+        else {
+            x[i-1] = 1;
+            res = res - values[i - 1]; 
+            c = c - weights[i - 1]; 
+        } 
+    }
+}
+```
+
 **d) Ahora, resuelva el problema de programación dinámica usando tabulación, pero esta vez en lugar de usar el peso en las columnas use los valores de los objetos. Describa la solución usando programación dinámica para este enfoque de solución.**
 
+Existen 2 atributos clave para que podamos aplicar programación dinámica a un problema. La existencia de una **subestructura óptima** y de **problemas superpuestos**.
+
+Consideremos una mochila de capacidad $C$ y los siguiente items:
+
+|Item| It1 | It2 | It3 | It4 | It5 | It6 | It7 |
+|--|--|--|--|--|--|--|--|
+| Peso | 3 | 2 | 4 | 5 | 6 | 2 | 1 |
+| Valor | 2 | 3 | 5 | 4 | 3 | 5 | 2 |
+
+Para entender el algoritmo debemos precisar cuál es el problema que en realidad resolvemos utilizando la siguiente tabla.
+Las columnas representan valores en el intervalo $[1, V]$ con $V = \sum_{i=1}^{7} v_i$, por su parte, las filas representan a los items.
+Cada columna servirá de valor objetivo de manera que en cada celda almacenamos un peso si y solo si alcanzamos dicho valor, ya sea insertando sólo ítem actual o una selección de items, privilegiando aquella alternativa de menor peso. 
+
+Si miramos la celda $(f, c) = (1,2)$ veremos el número **3** que es el **peso del item 1**. Notemos que para su fila ninguna otra celda está llena. Esto es evidente, pues estamos considerando un único elemento.
+
+Considerando la fila la celda $(f, c) = (2,2)$ nos enfrentamos al problema de buscar una combinación de ítems óptima de valor 2 por segunda vez. Al contrario que la primera vez, lo único que debemos hacer es rescatar el valor de la fila anterior. Nos hemos encontrado con un **problema superpuesto y hemos almacenado su valor para reducir la complejidad del problema**.
+
+Siguiendo la misma lógica pongamos atención a la celda $(f, c) = (4,6)$. Si insertamos el **ítem 4** nos harán falta **2 unidades de valor** **¿Cuál es la combinación de objetos óptima para el valor 2?**. No será necesario recomputar la solución: esta siempre estará almacenada en la fila inmediatamente anterior (en caso de que exista).
+
+Una vez que hemos completado la tabla, podemos buscar la solución óptima para la mochila. Para esto, vamos a la última columna, la de mayor valor, y buscamos un peso $w$ tal que $w <= C$. Si no lo hayamos, retrocedemos una columna y buscamos de nuevo. Repetimos cuantas veces sea necesario. Para conseguir la lista de ítems, iteramos sobre las filas de la tabla. Para ver cuales pertenecen al conjunto solución, miramos la celda actual y la que está inmediatamente arriba, si tienen el mismo valor, el objeto actual no pertenece y debemos repetir el proceso hasta que hayamos alcanzado el valor objetivo. Podemos explicar intuitivamente esto: si una celda tiene el mismo valor que la de arriba quiere decir que es producto de una optimización previa. 
+
+Es necesario notar que este algoritmo realmente minimiza el peso de los objetos tomando como restricción un cierto valor $v$ y una combinación de items. A diferencia del caso anterior, la capacidad de la mochila no es relevante. En este ejemplo nunca hemos proporcionado un valor para $C% y las conclusiones siguen teniendo validez.
+
+Supongamos que por motivos que escapan a nuestro poder el algoritmo se detiene en el **ítem 4**. Los resultados seguirán siendo válidos para esos cuatro objetos, o en otras palabras, nos encontramos frente una **subestructura óptima**.
+
+|   |     | V | A | L | O | R | E | S |     |    |
+|---|-----|---|---|---|---|---|---|---|-----|----|
+|   |     | **1** | **2** | **3** | **4** | **5** | **6** | **7** | **...** | **24** |
+| **I** | **1**   | - | 3 | - | - | - | - | - | ... | -  |
+| **T** | **2**   | - | 3 | 2 | - | 5 | - |   | ... |    |
+| **E** | **3**   | - | 3 | 2 | - | 4 | - | 7 | ... |    |
+| **M** | **4**   | - | 3 | 2 | 5 | 4 | 8 | 7 | ... |    |
+| **S** | **...**  |   |   |   |   |   |   |   | ... |    |
+
+
+```cpp
+/*
+    Input    
+    values: valores de los objetos
+    weights: peso de los objetos
+    C: capacidad en peso de la mochila
+    x: arreglo binario vacío que representa los objetos dentro de la mochila
+    Output: 
+    valor total de los objetos dentro de la mochila
+    x: arreglo binario con los objetos dentro de la mochila al finalizar el algortimo
+*/
+int knapsackV(vector<int> &values, vector<int> &weights, int C, vector<int> &x) {
+    int V = 0;
+    int n = values.size();
+    for (int i = 0; i < n; i++)
+        V += values[i];
+    vector<int> aux(V+1, 0);
+    vector<vector<int> > memo(values.size() + 1, aux);  
+    memo[0][0] = C + 1;      
+    pair<int, int> max_weight = make_pair(0,0);        
+    for (int e = 1; e < n + 1; e++){        
+        for (int v = 1; v < V + 1; v++) {
+            int opcion1 = MAX;
+            int opcion2 = MAX;
+            int valorRestante = v - values[e - 1]; //1
+            if (memo[e - 1][v] > 0)
+                opcion1 = memo[e - 1][v];
+            if (valorRestante >= 0) {
+                if (valorRestante == 0) 
+                    opcion2 = weights[e - 1];
+                else if (memo[e - 1][valorRestante] != 0)
+                    opcion2 = weights[e - 1] + memo[e - 1][valorRestante];
+            }
+            int seleccionado = min(opcion1, opcion2);
+            if (seleccionado != MAX) {
+                memo[e][v] = seleccionado;
+                if (seleccionado <= C && max_weight.second <= v) {
+                    if (max_weight.second < v || memo[max_weight.first][max_weight.second] > seleccionado) {
+                        max_weight.first = e;
+                        max_weight.second = v;   
+                    }
+                }
+            }
+        }
+    }
+
+    int v = max_weight.second;
+    for (int e = max_weight.first; e > 0; e--) {
+        if (v == 0) 
+            break;
+        if (memo[e][v] != memo[e - 1][v]) {
+            x[e - 1] = 1;
+            v = v - values[e - 1];            
+        }
+    }
+    return max_weight.second;
+}
+```
+
 **e) Considere el mismo algoritmo anterior, pero ahora asuma que puede aceptar algo de error y no requiere obtener el óptimo. En este caso analice el caso en el cual los objetos se pueden agrupar por valor $\lfloor \frac{v_{i}}{x} \rfloor$, donde $x = (1 − \beta) \frac{V}{n}$ y $0 < \beta < 1$, y $V = \Sigma_{i}^{n}vi$. Esta solución conlleva a un algoritmo aproximado. Para este caso, implemente el algoritmo, analice el tiempo de ejecución asintótico del algoritmo en el peor caso, el error absoluto máximo y el factor de aproximación $ \rho (n) = \frac{V^*}{V_a}$, donde $V^*$ es la solución óptima y $V_a$ la solución aproximada.**
+
+```cpp
+/*
+    Input
+    float e: margen de error
+    values: valores de los objetos
+    weights: peso de los objetos
+    C: capacidad en peso de la mochila
+    x: arreglo binario vacío que representa los objetos dentro de la mochila
+    Output: 
+    valor total de los objetos dentro de la mochila
+    x: arreglo binario con los objetos dentro de la mochila al finalizar el algortimo
+*/
+int knapsack_approx(float e, vector<int> &values, vector<int> &weights, int C, vector<int> &x){    
+    int V = 0;
+    int n = values.size();
+    for (int i = 0; i < n; i++)
+        V += values.at(i);
+    int X = (1-e)*V/n;
+
+    for (int i = 0; i < n; i++) 
+        values[i] = values[i] / X;
+
+    return knapsackV(values, weights, C, x);
+}
+```
 
 **f) Considere que la entrada se proporciona en un archivo de entrada donde cada linea contiene el siguiente formato:**
 **$<n> <C> <lista$  $p_i$  $v_i>$**
