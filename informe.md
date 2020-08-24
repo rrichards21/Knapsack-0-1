@@ -269,6 +269,24 @@ int knapsack_approx(float e, vector<int> &values, vector<int> &weights, int C, v
 }
 ```
 
+El tiempo de ejecución del algoritmo original es $O(n*V)$, donde $V = \Sigma_{i}^{n}vi$ . Para este caso, al agrupar por valor usando el factor $x = (1 − \beta) \frac{V}{n}$, se obtiene lo siguiente:
+
+$O(n*\frac{V}{(1-\beta)\frac{V}{n}}) \iff O(\frac{n^2}{(1-\beta)})$
+
+De esta forma, se obtiene que el tiempo de ejecución para el algoritmo aproximado es de $O(\frac{n^2}{(1-\beta)})$. De esta forma se elimina el factor $V$, lo que lleva a que el algoritmo quede en tiempo de ejecución de peor caso en exponencial, dependiendo de si el valor $\beta$ es cercano a 1.
+
+Si analizamos el caso en que se tienen dos objetos $v_a$ y $v_b$ y $v_a < v_b$, ocurrirá un error si es que $\lfloor \frac{v_{a}}{x} \rfloor = \lfloor \frac{v_{b}}{x} \rfloor$, ya que el algoritmo puede decidir tomar $v_a$ pero en realidad la mejor decisión es tomar $v_b$, de esta forma el valor perdido al realizar la aproximación es de $v_b - v_a < x$, es decir, cada error será menor a $x$.
+
+Si existen a lo más $n$ objetos seleccionados en una solución óptima, se tiene que a lo más se pueden generar $n$ errores, donde cada uno de esos errores cuesta menos que $x$, de esta forma el error absoluto máximo del algoritmo será menor a $n*x$.
+
+Sea $V$ la solución óptima del problema y $V-nx$ la solución aproximada, se tiene que el factor de aproximación $\rho (n) = \frac{V}{V-nx}$, donde $x = \frac{V}{n}(1-\beta)$, de esta manera se obtiene lo siguiente:
+
+ $\rho (n) = \frac{V}{V-n\frac{V}{n}(1-\beta)} = \frac{V}{V-V(1-\beta)} = \frac{V}{V-V +V\beta)} = \frac{V}{V\beta} = \frac{1}{\beta}$
+
+Así, $ \rho (n) = \frac{1}{\beta}$, por lo que para tener una aproximación a la solución óptima que evite errores, se deben tener valores de $\beta$ que sean cercanos a 1, en consecuencia de tener un tiempo de ejecución más alto, en el caso de si se escogen valores de $\beta$ más alejados a 1, se tiene como consecuencia un tiempo de ejecución más rápido, pero a cambio se tendrán más errores.
+
+
+
 **f) Considere que la entrada se proporciona en un archivo de entrada donde cada linea contiene el siguiente formato:**
 **$<n> <C> <lista$  $p_i$  $v_i>$**
 **Y la salida asociada a cada Instancia de entrada debe ser:**
